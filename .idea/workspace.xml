@@ -102,6 +102,17 @@
     </task>
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -111,17 +122,17 @@
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main/SchedulerMaker.py</url>
+          <url>file://$PROJECT_DIR$/main/ScheduleMaker.py</url>
           <line>135</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main/SchedulerMaker.py</url>
+          <url>file://$PROJECT_DIR$/main/ScheduleMaker.py</url>
           <line>99</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main/SchedulerMaker.py</url>
+          <url>file://$PROJECT_DIR$/main/ScheduleMaker.py</url>
           <line>51</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
