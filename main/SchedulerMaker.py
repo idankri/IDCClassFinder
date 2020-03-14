@@ -50,7 +50,7 @@ class ScheduleMaker:
                 u'ctl00$ctl26$g_cdf367b8_9960_4a77_9e5b_247c7c6d5387$ctl00$CurriculumPickerSchedule$School')[0])
             school_num = len(se.options)
             se.select_by_visible_text(se.options[current_school].text)
-            #time.sleep(0.1)
+            # time.sleep(0.1)
 
             current_year = 1
             year_num = 2  # temp value
@@ -59,7 +59,7 @@ class ScheduleMaker:
                     u'ctl00$ctl26$g_cdf367b8_9960_4a77_9e5b_247c7c6d5387$ctl00$CurriculumPickerSchedule$StudyYear')[0])
                 year_num = len(se.options)
                 se.select_by_visible_text(se.options[current_year].text)
-                #time.sleep(0.1)
+                # time.sleep(0.1)
 
                 current_spec = 1
                 specs_num = 2  # temp value
@@ -97,11 +97,11 @@ class ScheduleMaker:
         :param semester: which semester to create
         :return:
         """
-        #self.driver = self.init_driver()
+        # self.driver = self.init_driver()
         class_dict = defaultdict(lambda: defaultdict(list))  # maybe consider working with regular dict?
         for _ in self.table_generator(semester):
             self._extract_all_times_from_table(class_dict)
-        self.create_json()#dict(class_dict))
+        self.create_json()  # dict(class_dict))
         self.tear_down()
 
     def create_json(self):
@@ -116,10 +116,10 @@ class ScheduleMaker:
         """
         # goes through days 1 (sunday) to 6 (friday)
         for i in range(1, 7):
-            text = self.driver.find_element_by_xpath(r'//*[@id="ScheduleTab"]/table[2]/tbody/tr[2]/td[' + str(i) + ']').text
+            text = self.driver.find_element_by_xpath(
+                r'//*[@id="ScheduleTab"]/table[2]/tbody/tr[2]/td[' + str(i) + ']').text
             self._find_classes_by_hours(text, class_dict, i)
         return class_dict
-
 
     def _find_classes_by_hours(self, text: str, class_dict: defaultdict, day: int):
         """
