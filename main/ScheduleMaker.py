@@ -22,6 +22,7 @@ from main.Retry import retry
 import json
 
 CHROME_DRIVER = r'C:\Webdrivers\chromedriver.exe'
+JSON_PATH = r'C:\Users\User\Documents\Projects\IDCClassFinder\main\data.json'
 
 YEDION_URL = r'http://portal.idc.ac.il/he/main/services/newsletter_regulations/yedion/pages/thisyearheb.aspx'
 
@@ -104,7 +105,7 @@ class ScheduleMaker:
         :param schedule_dict: the dict that contains all the classes and the hours.
         :return: a json file.
         """
-        with open(r'C:\Users\User\Documents\Projects\IDCClassFinder\main\data.json', 'w') as outfile:
+        with open(JSON_PATH, 'w') as outfile:
             json.dump(schedule_dict, outfile)
 
     def _extract_all_times_from_table(self, class_dict):
