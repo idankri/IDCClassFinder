@@ -72,9 +72,6 @@ class ScheduleMaker:
                         yield
                     except selenium.common.exceptions.NoSuchElementException:
                         pass
-                    current_spec += 1
-                current_year += 1
-            current_school += 1
 
     def tear_down(self):
         """
