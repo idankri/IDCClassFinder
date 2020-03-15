@@ -18,6 +18,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from collections import defaultdict
 import time, re
+from main.Retry import retry
 
 CHROME_DRIVER = r'C:\Webdrivers\chromedriver.exe'
 
@@ -60,15 +61,16 @@ class ScheduleMaker:
             for current_year in range(1, year_num):
                 DriverUtils.select_option(self.driver, YEAR_XPATH, current_year)
 
-                specs_num = DriverUtils.get_option_num(self.driver, YEAR_XPATH)
+                specs_num = DriverUtils.get_option_num(self.driver, SPEC_XPATH)
                 for current_spec in range(1, specs_num):
                     DriverUtils.select_option(self.driver, SPEC_XPATH, current_spec)
-
-                    self.driver.find_elements_by_xpath(SEARCH_XPATH)[0].click()
                     time.sleep(0.5)
                     try:
+                        self.driver.find_elements_by_xpath(SEARCH_XPATH)[0].click()
+                        time.sleep(0.5)
                         sem_id = FIRST_SEMESTER_LINK_ID if semester == 1 else SECOND_SEMESTER_LINK_ID
                         self.driver.find_element_by_id(sem_id).click()
+                        time.sleep(1)
                         yield
                     except selenium.common.exceptions.NoSuchElementException:
                         pass
@@ -88,7 +90,10 @@ class ScheduleMaker:
         # self.driver = self.init_driver()
         class_dict = defaultdict(lambda: defaultdict(list))  # maybe consider working with regular dict?
         for _ in self.table_generator(semester):
-            self._extract_all_times_from_table(class_dict)
+            try:
+                self._extract_all_times_from_table(class_dict)
+            except Exception as e:
+                print(e)
         self.create_json()  # dict(class_dict))
         self.tear_down()
 
@@ -104,8 +109,8 @@ class ScheduleMaker:
         """
         # goes through days 1 (sunday) to 6 (friday)
         for i in range(1, 7):
-            text = self.driver.find_element_by_xpath(
-                r'//*[@id="ScheduleTab"]/table[2]/tbody/tr[2]/td[' + str(i) + ']').text
+            text = DriverUtils.get_table_data(self.driver,
+                                              r'//*[@id="ScheduleTab"]/table[2]/tbody/tr[2]/td[]', i)
             self._find_classes_by_hours(text, class_dict, i)
         return class_dict
 
@@ -128,14 +133,24 @@ class ScheduleMaker:
 
 class DriverUtils:
     @staticmethod
+    @retry(selenium.common.exceptions.NoSuchElementException, tries=3, delay=2)
     def get_option_num(driver, xpath):
         se = Select(driver.find_element_by_xpath(xpath))
         return len(se.options)
 
     @staticmethod
+    @retry(selenium.common.exceptions.NoSuchElementException, tries=3, delay=2)
     def select_option(driver, xpath: str, option: int):
         se = Select(driver.find_element_by_xpath(xpath))
         se.select_by_visible_text(se.options[option].text)
+
+    @staticmethod
+    @retry(selenium.common.exceptions.NoSuchElementException, tries=3, delay=2)
+    def get_table_data(driver, xpath: str, td_num):
+        text = driver.find_element_by_xpath(xpath[:-1] + str(td_num) + ']').text
+        return text
+
+
 
 
 if __name__ == '__main__':
