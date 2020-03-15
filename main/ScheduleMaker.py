@@ -19,6 +19,7 @@ from selenium.webdriver.support.ui import Select
 from collections import defaultdict
 import time, re
 from main.Retry import retry
+import json
 
 CHROME_DRIVER = r'C:\Webdrivers\chromedriver.exe'
 
@@ -97,9 +98,14 @@ class ScheduleMaker:
         self.create_json()  # dict(class_dict))
         self.tear_down()
 
-    def create_json(self):
-        # TODO: write
-        pass
+    def create_json(self, schedule_dict):
+        """
+        Document the data that was collected into the dict to a json file.
+        :param schedule_dict: the dict that contains all the classes and the hours.
+        :return: a json file.
+        """
+        with open(r'C:\Users\User\Documents\Projects\IDCClassFinder\main\data.json', 'w') as outfile:
+            json.dump(schedule_dict, outfile)
 
     def _extract_all_times_from_table(self, class_dict):
         """
