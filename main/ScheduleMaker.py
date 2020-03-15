@@ -38,6 +38,7 @@ SECOND_SEMESTER_LINK_ID = u'ctl00_ctl26_g_cdf367b8_9960_4a77_9e5b_247c7c6d5387_c
 class ScheduleMaker:
     def __init__(self):
         self.driver = self.init_driver()
+        self.class_dict = defaultdict(lambda: defaultdict(list))
 
     @staticmethod
     def init_driver():
@@ -79,9 +80,10 @@ class ScheduleMaker:
 
     def tear_down(self):
         """
-        Quits the web driver.
+        Quits the web driver, and deletes reference to the class dict
         """
         self.driver.quit()
+        self.class_dict = None
 
     def main(self, semester=1):
         """
@@ -89,26 +91,25 @@ class ScheduleMaker:
         :param semester: which semester to create
         :return:
         """
-        # self.driver = self.init_driver()
-        class_dict = defaultdict(lambda: defaultdict(list))  # maybe consider working with regular dict?
         for _ in self.table_generator(semester):
             try:
-                self._extract_all_times_from_table(class_dict)
+                self._extract_all_times_from_table()
             except Exception as e:
                 print(e)
-        self.create_json()  # dict(class_dict))
+        self.class_dict = {k: dict(v) for k, v in self.class_dict}
+        self.create_json()
         self.tear_down()
 
-    def create_json(self, schedule_dict):
+    def create_json(self):
         """
         Document the data that was collected into the dict to a json file.
         :param schedule_dict: the dict that contains all the classes and the hours.
         :return: a json file.
         """
         with open(JSON_PATH, 'w') as outfile:
-            json.dump(schedule_dict, outfile)
+            json.dump(self.class_dict, outfile)
 
-    def _extract_all_times_from_table(self, class_dict):
+    def _extract_all_times_from_table(self):
         """
         Iterates through all tables and extracting the class dict (containing schedule for each class)
         :param class_dict:
@@ -118,10 +119,9 @@ class ScheduleMaker:
         for i in range(1, 7):
             text = DriverUtils.get_table_data(self.driver,
                                               r'//*[@id="ScheduleTab"]/table[2]/tbody/tr[2]/td[]', i)
-            self._find_classes_by_hours(text, class_dict, i)
-        return class_dict
+            self._find_classes_by_hours(text, i)
 
-    def _find_classes_by_hours(self, text: str, class_dict: defaultdict, day: int):
+    def _find_classes_by_hours(self, text: str, day: int):
         """
         Extract the Schedule for each class from given data using Regex
         :param text: text (should be extracted from table)
@@ -133,9 +133,8 @@ class ScheduleMaker:
             r"(?P<time_frame>\d{1,2}:\d{2} - \d{1,2}:\d{2})\n[^a-zA-Z0-9]*(?P<class_room>[a-zA-Z0-9\.]+)")
         all_times = reg.findall(text)
         for time_frame, class_room in all_times:
-            if time_frame not in class_dict[class_room][day]:
-                class_dict[class_room][day].append(time_frame)
-        return class_dict
+            if time_frame not in self.class_dict[class_room][day]:
+                self.class_dict[class_room][day].append(time_frame)
 
 
 class DriverUtils:
@@ -156,9 +155,7 @@ class DriverUtils:
     def get_table_data(driver, xpath: str, td_num):
         text = driver.find_element_by_xpath(xpath[:-1] + str(td_num) + ']').text
         return text
-
-
-
+    
 
 if __name__ == '__main__':
     sm = ScheduleMaker()
