@@ -17,7 +17,8 @@ import selenium.common.exceptions
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from collections import defaultdict
-import time, re
+import time
+import re
 from main.Retry import retry
 import json
 
@@ -96,18 +97,18 @@ class ScheduleMaker:
                 self._extract_all_times_from_table()
             except Exception as e:
                 print(e)
-        self.class_dict = {k: dict(v) for k, v in self.class_dict}
+        self.class_dict = dict(self.class_dict)
+        # self.class_dict = {k: dict(v) for k, v in self.class_dict}
         self.create_json()
         self.tear_down()
 
     def create_json(self):
         """
         Document the data that was collected into the dict to a json file.
-        :param schedule_dict: the dict that contains all the classes and the hours.
         :return: a json file.
         """
-        with open(JSON_PATH, 'w') as outfile:
-            json.dump(self.class_dict, outfile)
+        with open(JSON_PATH, 'w', encoding='utf-8') as f:
+            json.dump(self.class_dict, f, ensure_ascii=False, indent=4)
 
     def _extract_all_times_from_table(self):
         """
